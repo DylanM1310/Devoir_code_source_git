@@ -15,3 +15,5 @@ class Student: #creation of a student class
 
 class InvalidGrade(Exception):
   pass
+
+# Bonjour ceci est un test de julian

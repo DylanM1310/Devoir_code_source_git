@@ -1,14 +1,7 @@
 name: Python Code Verification Workflow
 
 # Déclencheurs du workflow
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+on: [push]
 jobs:
   verify-code:
     runs-on: ubuntu-latest
@@ -48,3 +41,5 @@ jobs:
         with:
           name: python-code-reports
           path: reports/
+
+  

@@ -1,0 +1,54 @@
+name: CI Workflow
+
+# Déclencheurs du workflow
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    # Définit le système d'exploitation
+    runs-on: ubuntu-latest
+
+    steps:
+      # Vérifie le code source
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Installe la version de Node.js (peut être adaptée à votre projet)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      # Installe les dépendances du projet
+      - name: Install dependencies
+        run: npm install
+
+      # Exécute les tests
+      - name: Run tests
+        run: npm test
+
+      # Vérifie le style du code (lint)
+      - name: Run linter
+        run: npm run lint
+
+  deploy:
+    # Dépendance au job précédent (build)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && success()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Exemple d'une étape de déploiement (personnalisez selon votre besoin)
+      - name: Deploy to server
+        run: |
+          echo "Déploiement en cours..."
+          # Commandes de déploiement ici

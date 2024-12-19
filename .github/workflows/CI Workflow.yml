@@ -1,4 +1,4 @@
-name: CI Workflow
+name: Python Code Verification Workflow
 
 # Déclencheurs du workflow
 on:
@@ -10,45 +10,42 @@ on:
       - main
 
 jobs:
-  build:
-    # Définit le système d'exploitation
+  verify-code:
     runs-on: ubuntu-latest
 
     steps:
-      # Vérifie le code source
+      # Étape 1 : Cloner le dépôt
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Installe la version de Node.js (peut être adaptée à votre projet)
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Étape 2 : Configurer Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          node-version: 16
+          python-version: 3.10  # Vous pouvez changer la version si nécessaire
 
-      # Installe les dépendances du projet
+      # Étape 3 : Installer les dépendances
       - name: Install dependencies
-        run: npm install
-
-      # Exécute les tests
-      - name: Run tests
-        run: npm test
-
-      # Vérifie le style du code (lint)
-      - name: Run linter
-        run: npm run lint
-
-  deploy:
-    # Dépendance au job précédent (build)
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && success()
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Exemple d'une étape de déploiement (personnalisez selon votre besoin)
-      - name: Deploy to server
         run: |
-          echo "Déploiement en cours..."
-          # Commandes de déploiement ici
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 pytest pytest-html
+
+      # Étape 4 : Analyser le code avec flake8
+      - name: Run static code analysis (flake8)
+        run: |
+          mkdir -p reports
+          flake8 . --output-file=reports/flake8-report.txt
+        continue-on-error: true  # Ne pas arrêter le workflow même si des erreurs sont détectées
+
+      # Étape 5 : Exécuter les tests avec pytest
+      - name: Run tests with pytest
+        run: |
+          pytest --junitxml=reports/test-report.xml --html=reports/test-report.html
+
+      # Étape 6 : Générer un rapport des artefacts
+      - name: Upload reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-code-reports
+          path: reports/

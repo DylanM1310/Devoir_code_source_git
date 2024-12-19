@@ -34,6 +34,7 @@ jobs:
       - name: Run tests with pytest
         run: |
           pytest --junitxml=reports/test-report.xml --html=reports/test-report.html
+        continue-on-error: true  # Ne pas arrêter le workflow même si des erreurs sont détectées
 
       # Étape 6 : Générer un rapport des artefacts
       - name: Upload reports

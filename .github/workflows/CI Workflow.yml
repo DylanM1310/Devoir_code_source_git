@@ -1,6 +1,6 @@
 name: Python Code Verification Workflow
 
-# Déclencheurs du workflow
+# Déclencheurs du workflow et d'un test
 on: [push]
 jobs:
   verify-code:
